@@ -18,15 +18,17 @@
   
   button { width: 100%; padding: 15px; background: #25D366; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
   button:hover { background: #1da851; }
+  button.send { background: #0071e3; margin-top: 15px; display: none; }
+  button.send:hover { background: #005bb5; }
   
-  .preview { background: #0f1923; border: 1px solid #2a3e4c; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #8a9ba8; display: none; white-space: pre-wrap; }
+  .preview { background: #0f1923; border: 1px solid #2a3e4c; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #8a9ba8; display: none; white-space: pre-wrap; word-wrap: break-word; }
 </style>
 </head>
 <body>
 
 <div class="card">
   <h1>Signalement WhatsApp</h1>
-  <p>Remplissez ce formulaire pour générer une plainte officielle à envoyer au support WhatsApp.</p>
+  <p>Remplissez ce formulaire pour générer une plainte officielle à envoyer au support.</p>
   
   <div class="input-group">
     <label>Numéro à signaler (avec indicatif)</label>
@@ -46,13 +48,14 @@
 
   <div class="input-group">
     <label>Détails (optionnel)</label>
-    <textarea id="details" rows="3" placeholder="Décrivez brièvement ce qui s'est passé..."></textarea>
+    <textarea id="details" rows="3" placeholder="Décrivez ce qui s'est passé..."></textarea>
   </div>
 
   <button onclick="generateEmail()">Générer la plainte</button>
   
   <div class="preview" id="preview"></div>
-  <button id="sendBtn" style="display:none; background: #0071e3; margin-top: 15px;" onclick="sendEmail()">Ouvrir l'application Mail</button>
+  
+  <button class="send" id="sendBtn" onclick="sendEmail()">Ouvrir l'application Mail</button>
 </div>
 
 <script>
@@ -68,25 +71,21 @@ function generateEmail() {
     return;
   }
 
-  // Construction du corps de l'email
-  emailBody = `À l'attention de l'équipe de modération WhatsApp,
-
-Je souhaite signaler un compte WhatsApp qui enfreint vos conditions d'utilisation.
-
-Numéro concerné : ${target}
-Motif : ${reason}
-${details ? "Détails : " + details : ""}
-
-Ce numéro est utilisé pour des activités malveillantes. Je vous demande de bien vouloir suspendre ce compte dans les plus brefs délais pour la sécurité de la communauté.
-
-En vous remerciant par avance pour votre traitement.
-
-Cordialement,
-Un utilisateur soucieux de sa sécurité.`;
+  // Utilisation de \n pour les retours à la ligne
+  emailBody = "À l'attention de l'équipe de modération WhatsApp,\n\n" +
+              "Je souhaite signaler un compte WhatsApp qui enfreint vos conditions d'utilisation.\n\n" +
+              "Numéro concerné : " + target + "\n" +
+              "Motif : " + reason + "\n" +
+              (details ? "Détails : " + details + "\n" : "") + 
+              "\nCe numéro est utilisé pour des activités malveillantes. Je vous demande de bien vouloir suspendre ce compte dans les plus brefs délais.\n\n" +
+              "Cordialement,\nUn utilisateur soucieux de sa sécurité.";
 
   // Affichage de l'aperçu
-  document.getElementById('preview').innerText = emailBody;
-  document.getElementById('preview').style.display = 'block';
+  const preview = document.getElementById('preview');
+  preview.innerText = emailBody;
+  preview.style.display = 'block';
+  
+  // Affichage du bouton d'envoi
   document.getElementById('sendBtn').style.display = 'block';
 }
 
@@ -94,8 +93,8 @@ function sendEmail() {
   const subject = encodeURIComponent("Signalement de compte WhatsApp malveillant");
   const body = encodeURIComponent(emailBody);
   
-  // Ouvre le client mail de l'utilisateur
-  window.location.href = `mailto:support@whatsapp.com?subject=${subject}&body=${body}`;
+  // Ouvre le client mail
+  window.location.href = "mailto:support@whatsapp.com?subject=" + subject + "&body=" + body;
 }
 </script>
 
